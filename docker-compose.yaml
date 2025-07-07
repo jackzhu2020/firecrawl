@@ -23,8 +23,8 @@ x-common-env: &common-env
   OPENAI_API_KEY: ${OPENAI_API_KEY}
   OPENAI_BASE_URL: ${OPENAI_BASE_URL}
   MODEL_NAME: ${MODEL_NAME}
-  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME} 
-  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL} 
+  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME}
+  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
   SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
   BULL_AUTH_KEY: ${BULL_AUTH_KEY}
   TEST_API_KEY: ${TEST_API_KEY}
@@ -45,22 +45,24 @@ x-common-env: &common-env
   SEARXNG_CATEGORIES: ${SEARXNG_CATEGORIES}
 
 services:
-  playwright-service:
-    # NOTE: If you don't want to build the service locally,
-    # uncomment the build: statement and comment out the image: statement
-    # image: ghcr.io/mendableai/playwright-service:latest
-    build: apps/playwright-service-ts
-    environment:
-      PORT: 3000
-      PROXY_SERVER: ${PROXY_SERVER}
-      PROXY_USERNAME: ${PROXY_USERNAME}
-      PROXY_PASSWORD: ${PROXY_PASSWORD}
-      BLOCK_MEDIA: ${BLOCK_MEDIA}
-    networks:
-      - backend
+  # playwright-service:
+  #   # NOTE: If you don't want to build the service locally,
+  #   # uncomment the build: statement and comment out the image: statement
+  #   # image: ghcr.io/mendableai/playwright-service:latest
+  #   build: apps/playwright-service-ts
+  #   restart: always
+  #   environment:
+  #     PORT: 3000
+  #     PROXY_SERVER: ${PROXY_SERVER}
+  #     PROXY_USERNAME: ${PROXY_USERNAME}
+  #     PROXY_PASSWORD: ${PROXY_PASSWORD}
+  #     BLOCK_MEDIA: ${BLOCK_MEDIA}
+  #   networks:
+  #     - backend
 
   api:
     <<: *common-service
+    restart: always
     environment:
       <<: *common-env
       HOST: "0.0.0.0"
@@ -69,22 +71,23 @@ services:
       ENV: local
     depends_on:
       - redis
-      - playwright-service
+      # - playwright-service
     ports:
       - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
-    command: [ "pnpm", "run", "start:production" ]
+    command: ["pnpm", "run", "start:production"]
 
   worker:
     <<: *common-service
+    restart: always
     environment:
       <<: *common-env
       FLY_PROCESS_GROUP: worker
       ENV: local
     depends_on:
       - redis
-      - playwright-service
+      # - playwright-service
       - api
-    command: [ "pnpm", "run", "workers" ]
+    command: ["pnpm", "run", "workers"]
 
   redis:
     # NOTE: If you want to use Valkey (open source) instead of Redis (source available),
