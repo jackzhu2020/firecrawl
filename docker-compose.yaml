@@ -79,6 +79,7 @@ services:
   worker:
     <<: *common-service
     restart: always
+    scale: 3
     environment:
       <<: *common-env
       FLY_PROCESS_GROUP: worker
