@@ -166,6 +166,7 @@ const scrapePage = async (
   }
 
   return {
+    url: response ? response.url() : url,
     content,
     status: response ? response.status() : null,
     headers,
@@ -247,6 +248,7 @@ app.post("/scrape", async (req: Request, res: Response) => {
     }
 
     res.json({
+      url: result.url,
       content: result.content,
       pageStatusCode: result.status,
       contentType: result.contentType,
