@@ -27,6 +27,7 @@ export async function scrapeURLWithPlaywright(
       logger: meta.logger.child("scrapeURLWithPlaywright/robustFetch"),
       schema: z.object({
         content: z.string(),
+        url: z.string(),
         pageStatusCode: z.number(),
         pageError: z.string().optional(),
         contentType: z.string().optional(),
@@ -48,7 +49,7 @@ export async function scrapeURLWithPlaywright(
   }
 
   return {
-    url: meta.rewrittenUrl ?? meta.url, // TODO: impove redirect following
+    url: response.url ?? meta.rewrittenUrl ?? meta.url, // TODO: impove redirect following
     html: response.content,
     statusCode: response.pageStatusCode,
     error: response.pageError,
